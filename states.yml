@@ -1,0 +1,33 @@
+- name: bgp_state
+  decription: State that holds information about bgp state errors
+  type: increment
+  parse_fields:
+    - errorcode
+  label_fields:
+    - edge
+    - host
+  inc_pattern: 30902
+  dec_pattern: 30901
+
+- name: split_brain
+  decription: State that holds information about split brain states
+  type: increment
+  parse_fields:
+    - errorcode
+  label_fields:
+    - edge
+    - host
+  inc_pattern: 30205
+  dec_pattern: 30206
+
+- name: ospf_state
+  decription: State that holds information about ospf state errors
+  type: increment
+  parse_fields:
+    - errorcode
+  label_fields:
+    - edge
+    - host
+  inc_pattern: 30905
+  dec_pattern: 30904
+
