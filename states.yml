@@ -1,6 +1,6 @@
-- name: bgp_state
+- name: elcprom_bgp_state
   decription: State that holds information about bgp state errors
-  type: increment
+  type: binary
   parse_fields:
     - errorcode
   label_fields:
@@ -9,9 +9,9 @@
   inc_pattern: 30902
   dec_pattern: 30901
 
-- name: split_brain
+- name: elcprom_split_brain
   decription: State that holds information about split brain states
-  type: increment
+  type: binary
   parse_fields:
     - errorcode
   label_fields:
@@ -20,9 +20,9 @@
   inc_pattern: 30205
   dec_pattern: 30206
 
-- name: ospf_state
+- name: elcprom_ospf_state
   decription: State that holds information about ospf state errors
-  type: increment
+  type: binary
   parse_fields:
     - errorcode
   label_fields:
