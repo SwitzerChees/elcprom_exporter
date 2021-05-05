@@ -1,6 +1,5 @@
 from prometheus_client import Gauge
 import argparse
-import hashlib
 import yaml
 import json
 import os
@@ -14,7 +13,7 @@ class State:
                             help='The file which holds the configurated states')
         parser.add_argument('--current_state_file', default='current_states.json',
                             help='The file which persists the current state of the configurated states')
-        args = vars(parser.parse_args())
+        args = vars(parser.parse_known_args()[0])
         self.state_file = args['state_file']
         self.current_state_file = args['current_state_file']
         self.load()
@@ -32,7 +31,7 @@ class State:
             with open(os.path.join(dir_path, self.current_state_file)) as file:
                 self.current_state = json.load(file)
         else:
-            self.current_state = {}
+            self.current_state = []
 
     def persist(self):
         with open(self.current_state_file, 'w') as outfile:
@@ -68,37 +67,39 @@ class State:
         if change != 0:
             label_values = [data[l] for l in state['label_fields']
                             ] if state.get('label_fields') is not None else []
-            label_values.insert(0, state['name'])
-            self.change_state(change, state['type'], label_values)
+            self.change_state(
+                change, state['type'], state['name'], label_values)
             self.update_states()
             return True
         return False
 
-    def change_state(self, change, type, label_values):
+    def change_state(self, change, type, state_name, label_values):
         '''
         Change the metric depends on the type
         '''
-        id = bytearray(','.join(label_values), "utf8")
-        id_hash = hashlib.sha256(id).hexdigest()
-        if self.current_state.get(id_hash) is None:
-            self.current_state[id_hash] = {"labels": label_values, "value": 0}
+        found_state = [s for s in self.current_state if s['state_name']
+                       == state_name and s['labels'] == label_values]
+        if len(found_state) == 0:
+            found_state = {
+                "state_name": state_name, "labels": label_values, "value": 0}
+            self.current_state.append(found_state)
+        else:
+            found_state = found_state[0]
         if type == 'binary':
             if change > 0:
-                self.current_state[id_hash]['value'] = 1
+                found_state['value'] = 1
             elif change < 0:
-                self.current_state[id_hash]['value'] = 0
+                found_state['value'] = 0
         else:
             if change > 0:
-                self.current_state[id_hash]['value'] += 1
+                found_state['value'] += 1
             elif change < 0:
-                self.current_state[id_hash]['value'] -= 1
+                found_state['value'] -= 1
         self.persist()
 
     def update_states(self):
-        for state_id in self.current_state:
-            curr_state = self.current_state[state_id]
-            state_name = curr_state['labels'][0]
+        for curr_state in self.current_state:
             for state in self.state:
-                if state['name'] == state_name:
-                    metric = state['state'].labels(*curr_state['labels'][1:])
+                if state['name'] == curr_state['state_name']:
+                    metric = state['state'].labels(*curr_state['labels'])
                     metric.set(curr_state['value'])
