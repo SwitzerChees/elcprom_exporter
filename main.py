@@ -1,10 +1,7 @@
-
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from prometheus_client import make_wsgi_app
 from prometheus_client import Gauge
 from flask import Flask, Response, request
-from prometheus_client.core import CollectorRegistry
-from prometheus_client.multiprocess import MultiProcessCollector
 from datetime import datetime
 import yaml
 import os
@@ -35,8 +32,10 @@ def inc_dec(state, val, data):
         change_metric(change, state['type'], state['state'])
     else:
         label_values = [data[l] for l in state['label_fields']]
-        change_metric(change, state['type'], state['state'].labels(*label_values))
+        change_metric(change, state['type'],
+                      state['state'].labels(*label_values))
     return change != 0
+
 
 def change_metric(change, type, metric):
     '''
@@ -53,18 +52,17 @@ def change_metric(change, type, metric):
         elif change < 0:
             metric.dec()
 
+
 def generate_prometheus_states():
     '''
     Create gauge metric for every configured state
     '''
     configured_states = load_states()
     for configured_state in configured_states:
-        g = Gauge(configured_state['name'], configured_state['decription'], configured_state['label_fields'])
+        g = Gauge(
+            configured_state['name'], configured_state['decription'], configured_state['label_fields'])
         configured_state['state'] = g
     return configured_states
-
-
-configured_states = generate_prometheus_states()
 
 
 def manipulate_state(data):
@@ -80,6 +78,7 @@ def manipulate_state(data):
 
 # Define the endpoint for the state manipulation
 app = Flask(__name__)
+configured_states = generate_prometheus_states()
 
 
 @app.route('/states', methods=['POST'])
