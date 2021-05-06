@@ -4,7 +4,7 @@
   parse_fields:
     - errorcode
   label_fields:
-    - edge
+    - edge_id
     - host
   inc_pattern: 30902
   dec_pattern: 30901
@@ -15,7 +15,7 @@
   parse_fields:
     - errorcode
   label_fields:
-    - edge
+    - edge_id
     - host
   inc_pattern: 30205
   dec_pattern: 30206
@@ -26,7 +26,7 @@
   parse_fields:
     - errorcode
   label_fields:
-    - edge
+    - edge_id
     - host
   inc_pattern: 30905
   dec_pattern: 30904
