@@ -1,0 +1,12 @@
+[
+    {
+        "edge_id": "edge-796",
+        "host": "syslog_simulator.conn_monitoring_lab_conn_lab",
+        "edge_name": "ESG1-PROD01-YOLO"
+    },
+    {
+        "edge_id": "edge-123",
+        "host": "psrv01",
+        "edge_name": "THE-EDGE-NAME"
+    }
+]

@@ -1,0 +1,5 @@
+- file: nsx_edges.json
+  from:
+  - edge_id
+  - host
+  to: edge_name
