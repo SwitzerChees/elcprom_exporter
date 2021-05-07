@@ -1,4 +1,4 @@
-import argparse
+from utils import get_env_vars
 import yaml
 import json
 import os
@@ -7,14 +7,9 @@ import os
 class Mapper:
     def __init__(self, log) -> None:
         self.log = log
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--mapping_file', default='mappings.yml',
-                            help='The file which holds the configurated mappings')
-        parser.add_argument('--mapping_folder', default='mappings',
-                            help='The directory which holds the mapping files')
-        args = vars(parser.parse_known_args()[0])
-        self.mapping_file = args['mapping_file']
-        self.mapping_folder = args['mapping_folder']
+        env_vars = get_env_vars()
+        self.mapping_file = env_vars['MAPPING_FILE']
+        self.mapping_folder = env_vars['MAPPING_FOLDER']
         self.load()
 
     def load(self):

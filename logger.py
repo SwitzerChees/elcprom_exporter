@@ -1,22 +1,16 @@
-import argparse
+from utils import get_env_vars
 import logging
 import os
 
 
 class Logger:
     def __init__(self) -> None:
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--log_file', default='',
-                            help='Thes file where the logs get stored. If no file set, no log file is written')
-        args = vars(parser.parse_known_args()[0])
-        self.log_file = args['log_file']
-        dir_path = os.path.abspath(os.path.dirname(__file__))
-        if self.log_file != '':
-            if self.log_file[0] != '/':
-                self.log_file = os.path.join(dir_path, self.log_file)
-            logging.basicConfig(filename=self.log_file, filemode='w',
+        env_vars = get_env_vars()
+        self.output_file = env_vars['OUTPUT_FILE']
+        if self.output_file != '':
+            logging.basicConfig(filename=self.output_file, filemode='w',
                                 level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s')
-            print('log_file', self.log_file)
+            print('output_file', self.output_file)
 
     def info(self, msg, do_print=True):
         msg = str(msg)

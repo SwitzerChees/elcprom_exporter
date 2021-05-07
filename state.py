@@ -1,5 +1,5 @@
 from prometheus_client import Gauge
-import argparse
+from utils import get_env_vars
 import yaml
 import json
 import os
@@ -8,14 +8,9 @@ import re
 
 class State:
     def __init__(self) -> None:
-        parser = argparse.ArgumentParser()
-        parser.add_argument('--state_file', default='states.yml',
-                            help='The file which holds the configurated states')
-        parser.add_argument('--current_state_file', default='current_states.json',
-                            help='The file which persists the current state of the configurated states')
-        args = vars(parser.parse_known_args()[0])
-        self.state_file = args['state_file']
-        self.current_state_file = args['current_state_file']
+        env_vars = get_env_vars()
+        self.state_file = env_vars['STATE_FILE']
+        self.current_state_file = env_vars['CURRENT_STATE_FILE']
         self.load()
         self.generate_prometheus_states()
         self.update_states()
