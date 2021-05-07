@@ -1,8 +1,18 @@
 [
     {
-        "edge_id": "edge-796",
+        "edge_id": "edge-177",
         "host": "syslog_simulator.conn_monitoring_lab_conn_lab",
         "edge_name": "ESG1-PROD01-YOLO"
+    },
+    {
+        "edge_id": "edge-42",
+        "host": "syslog_simulator.conn_monitoring_lab_conn_lab",
+        "edge_name": "ESG2-PROD01-SWAG"
+    },
+    {
+        "edge_id": "edge-81",
+        "host": "syslog_simulator.conn_monitoring_lab_conn_lab",
+        "edge_name": "ESG3-PROD01-TEST"
     },
     {
         "edge_id": "edge-123",

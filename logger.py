@@ -12,9 +12,11 @@ class Logger:
         self.log_file = args['log_file']
         dir_path = os.path.abspath(os.path.dirname(__file__))
         if self.log_file != '':
-                logging.basicConfig(filename=os.path.join(
-                    dir_path, self.log_file), filemode='w', level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s')
-
+            if self.log_file[0] != '/':
+                self.log_file = os.path.join(dir_path, self.log_file)
+            logging.basicConfig(filename=self.log_file, filemode='w',
+                                level=logging.DEBUG, format='%(asctime)s %(levelname)s: %(message)s')
+            print('log_file', self.log_file)
 
     def info(self, msg, do_print=True):
         msg = str(msg)
