@@ -36,8 +36,16 @@ class Mapper:
             if(all(k in data != None for k in mapping['from'])):
                 mapping_file = next(
                     x for x in self.mapping_files if x['file'] == mapping['file'])
+                if mapping_file is None:
+                    self.log.info(f"Mapping file: '{mapping['file']}' not found")
+                    continue
+                mapping_found = False
                 for map_item in mapping_file['content']:
                     if(all(data[k] == map_item[k] for k in mapping['from'])):
                         data[mapping['to']] = map_item[mapping['to']]
                         self.log.info(f"Mapping, {mapping}, Map_item: {map_item}")
+                        mapping_found = True
                         break
+                if not mapping_found:
+                    self.log.info(f"No mapping found for Mapping: {mapping}")
+                    data[mapping['to']] = 'NO_MAPPING_FOUND'

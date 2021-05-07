@@ -60,8 +60,13 @@ class State:
         if len(m) > 0:
             change -= 1
         if change != 0:
-            label_values = [data[l] for l in state['label_fields']
-                            ] if state.get('label_fields') is not None else []
+            label_values = []
+            if state.get('label_fields') is not None:
+                for label in state['label_fields']:
+                    if label in data:
+                        label_values.append(data[label])
+                    else:
+                        label_values.append('MISSING_LABEL')
             self.change_state(
                 change, state['type'], state['name'], label_values)
             self.update_states()
