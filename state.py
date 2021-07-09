@@ -1,5 +1,7 @@
 from prometheus_client import Gauge
-from utils import get_env_vars
+
+from datetime import datetime, timedelta
+from pytimeparse import parse
 import yaml
 import json
 import os
@@ -7,12 +9,11 @@ import re
 
 
 class State:
-    def __init__(self) -> None:
-        env_vars = get_env_vars()
+    def __init__(self, env_vars) -> None:
         self.state_file = env_vars['STATE_FILE']
         self.current_state_file = env_vars['CURRENT_STATE_FILE']
         self.load()
-        self.generate_prometheus_states()
+        self.generate_states()
         self.update_states()
 
     def load(self):
@@ -32,11 +33,16 @@ class State:
         with open(self.current_state_file, 'w') as outfile:
             json.dump(self.current_state, outfile, indent=4)
 
-    def generate_prometheus_states(self):
+    def generate_states(self):
         for configured_state in self.state:
             g = Gauge(
                 configured_state['name'], configured_state['decription'], configured_state['label_fields'])
             configured_state['state'] = g
+            if configured_state.get('reset_duration') is not None:
+                configured_state['reset_duration'] = parse(
+                    configured_state['reset_duration'])
+            else:
+                configured_state['reset_duration'] = False
 
     def check_inc_dec(self, data):
         '''
@@ -79,7 +85,8 @@ class State:
         '''
         type = state['type']
         state_name = state['name']
-        remove_on_zero = state.get('remove_on_zero') if state.get('remove_on_zero') is not None else False
+        remove_on_zero = state.get('remove_on_zero') if state.get(
+            'remove_on_zero') is not None else False
         found_state = [s for s in self.current_state if s['state_name']
                        == state_name and s['labels'] == label_values]
         if len(found_state) == 0:
@@ -102,11 +109,18 @@ class State:
                 found_state['value'] += 1
             elif change < 0:
                 found_state['value'] -= 1
+        found_state['last_update'] = datetime.now().isoformat()
         self.persist()
 
     def update_states(self):
+        to_delete = []
         for curr_state in self.current_state:
             for state in self.state:
                 if state['name'] == curr_state['state_name']:
+                    if state['reset_duration'] and datetime.fromisoformat(curr_state['last_update']) + timedelta(seconds=state['reset_duration']) < datetime.now():
+                        to_delete.append(
+                            {'state': state, 'labels': curr_state['labels']})
                     metric = state['state'].labels(*curr_state['labels'])
                     metric.set(curr_state['value'])
+        for to_del in to_delete:
+            self.change_state(-1, to_del['state'], to_del['labels'])

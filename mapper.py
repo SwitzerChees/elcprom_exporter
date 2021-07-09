@@ -5,9 +5,8 @@ import os
 
 
 class Mapper:
-    def __init__(self, log) -> None:
+    def __init__(self, env_vars, log) -> None:
         self.log = log
-        env_vars = get_env_vars()
         self.mapping_file = env_vars['MAPPING_FILE']
         self.mapping_folder = env_vars['MAPPING_FOLDER']
         self.load()

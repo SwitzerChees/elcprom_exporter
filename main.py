@@ -1,15 +1,21 @@
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from flask import Flask, Response, request, jsonify
 from prometheus_client import make_wsgi_app
+from utils import get_env_vars
+from pytimeparse import parse
 from logger import Logger
 from mapper import Mapper
 from state import State
+from time import sleep
 from datetime import datetime
 import traceback
+import threading
 
-log = Logger()
-st = State()
-ma = Mapper(log)
+env_vars = get_env_vars()
+
+log = Logger(env_vars)
+st = State(env_vars)
+ma = Mapper(env_vars, log)
 
 # Define the endpoint for the state manipulation
 app = Flask(__name__)
@@ -36,5 +42,13 @@ app.wsgi_app = DispatcherMiddleware(app.wsgi_app, {
     '/metrics': make_wsgi_app()
 })
 
+
+def update_state_schedule():
+    while True:
+        sleep(parse(env_vars['SCHEDULE_INTERVAL']))
+        st.update_states()
+
+
 if __name__ == '__main__':
+    threading.Thread(target=update_state_schedule).start()
     app.run(debug=False, port=8080)

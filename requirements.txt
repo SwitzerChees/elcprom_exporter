@@ -1,4 +1,5 @@
 prometheus_client
+pytimeparse
 gunicorn
 pyyaml
 flask

@@ -1,6 +1,7 @@
 - name: elcprom_bgp_state
   decription: State that holds information about bgp state errors
   remove_on_zero: true
+  reset_duration: '1m'
   type: binary
   parse_fields:
     - errorcode
@@ -14,6 +15,7 @@
 - name: elcprom_split_brain
   decription: State that holds information about split brain states
   remove_on_zero: true
+  reset_duration: '1m'
   type: binary
   parse_fields:
     - errorcode
@@ -27,6 +29,7 @@
 - name: elcprom_ospf_state
   decription: State that holds information about ospf state errors
   remove_on_zero: true
+  reset_duration: '1m'
   type: binary
   parse_fields:
     - errorcode
