@@ -70,6 +70,17 @@ The exporter provides a very simple HTTP API with the follwoing endpoints.
 
 > **/metrics** (GET): The scrape endpoint for prometheus. 
 
+
+#### Test API Calls
+
+```bash
+curl --header "Content-Type: application/json" \
+     --request POST \
+     --data '{"errorcode":"30902", "host": "psrv01", "edge_id": "edge-123"}' \
+     http://localhost:8080/states
+```
+
+
 ## License
 
 This project is licensed under the Apache Version 2.0 License - see the LICENSE file for details.

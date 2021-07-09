@@ -68,15 +68,18 @@ class State:
                     else:
                         label_values.append('MISSING_LABEL')
             self.change_state(
-                change, state['type'], state['name'], label_values)
+                change, state, label_values)
             self.update_states()
             return True
         return False
 
-    def change_state(self, change, type, state_name, label_values):
+    def change_state(self, change, state, label_values):
         '''
         Change the metric depends on the type
         '''
+        type = state['type']
+        state_name = state['name']
+        remove_on_zero = state.get('remove_on_zero') if state.get('remove_on_zero') is not None else False
         found_state = [s for s in self.current_state if s['state_name']
                        == state_name and s['labels'] == label_values]
         if len(found_state) == 0:
@@ -89,7 +92,11 @@ class State:
             if change > 0:
                 found_state['value'] = 1
             elif change < 0:
-                found_state['value'] = 0
+                if remove_on_zero:
+                    self.current_state.remove(found_state)
+                    state['state'].remove(*found_state['labels'])
+                else:
+                    found_state['value'] = 0
         else:
             if change > 0:
                 found_state['value'] += 1

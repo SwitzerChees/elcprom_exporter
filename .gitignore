@@ -2,3 +2,4 @@ __pycache__
 current_states.json
 *.swp
 *.log
+venv
