@@ -1,6 +1,8 @@
 from prometheus_client import Gauge
 
 from datetime import datetime, timedelta
+from backports.datetime_fromisoformat import MonkeyPatch
+MonkeyPatch.patch_fromisoformat()
 from pytimeparse import parse
 import yaml
 import json
@@ -117,7 +119,10 @@ class State:
         for curr_state in self.current_state:
             for state in self.state:
                 if state['name'] == curr_state['state_name']:
-                    if state['reset_duration'] and datetime.fromisoformat(curr_state['last_update']) + timedelta(seconds=state['reset_duration']) < datetime.now():
+                    last_update = curr_state['last_update']
+                    if type(last_update) is not datetime:
+                        last_update = datetime.fromisoformat(curr_state['last_update'])
+                    if state['reset_duration'] and last_update + timedelta(seconds=state['reset_duration']) < datetime.now():
                         to_delete.append(
                             {'state': state, 'labels': curr_state['labels']})
                     metric = state['state'].labels(*curr_state['labels'])
